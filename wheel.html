@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spark Wash Prize Wheel</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font from Google Fonts, matching the previous design */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        /* Define a CSS variable for easy height adjustment */
+        :root {
+            --page-height: 100vh; /* You can change this value to a pixel value, percentage, etc. */
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* bg-slate-900 */
+            color: #e2e8f0; /* text-slate-200 */
+            /* The body now has an adjustable minimum height */
+            min-height: var(--page-height);
+            height: var(--page-height);
+            overflow-x: hidden; /* Prevent horizontal scrolling */
+            padding-bottom: 0; /* Removed extra padding at the bottom */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Full-screen confetti container */
+        #confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0;
+            transition: opacity 0.5s ease-out;
+        }
+        
+        /* Container for the wheel and pointer */
+        #wheel-container {
+            position: relative;
+            width: 65vmin; /* Responsive width, now smaller */
+            height: 65vmin;
+            max-width: 400px; /* Maximum size for desktop, now smaller */
+            max-height: 400px;
+            margin: auto;
+            filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.4));
+        }
+
+        /* The canvas for the wheel */
+        #wheelCanvas {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* The pointer/arrow for the wheel */
+        #pointer {
+            position: absolute;
+            top: -15px; /* Position above the wheel */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent; /* Smaller pointer */
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid #f97316; /* Color: orange-500 */
+            z-index: 10;
+            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
+        }
+
+        /* The decorative central pin */
+        #wheel-pin {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px; /* Smaller pin */
+            height: 50px;
+            background: radial-gradient(circle, #f97316 0%, #dc2626 100%);
+            border-radius: 50%;
+            border: 3px solid #fca5a5; /* Smaller border */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.2);
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Button styling with a nice shadow and transition */
+        #spinBtn {
+            font-size: 1rem; /* Reduced font size */
+            font-weight: 700;
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6); /* from-indigo-600 to-purple-600 */
+            color: white;
+            padding: 0.6rem 1.5rem; /* Reduced padding to match the image */
+            border-radius: 9999px; /* rounded-full */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #spinBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        #spinBtn:disabled {
+            background: #4b5563; /* bg-gray-600 */
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal styling */
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        #modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #modal-content {
+            background-color: #1e293b; /* bg-slate-800 */
+            padding: 2.5rem;
+            border-radius: 2rem;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalPop 0.4s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        #modal-prize {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316, #fb923c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        /* Spark Wash logo in the center of the wheel */
+        .spark-logo {
+            width: 25px; /* Smaller logo */
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            color: white;
+            font-weight: bold;
+            font-size: 1.25rem;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Confetti Container -->
+    <div id="confetti-container"></div>
+    
+    <!-- Main content area for the game -->
+    <main class="flex flex-col items-center justify-center mx-auto" style="margin-top: 1.5rem;">
+        <div id="wheel-container">
+            <canvas id="wheelCanvas"></canvas>
+            <div id="pointer"></div>
+            <div id="wheel-pin" class="animate-pulse-logo">
+                <div class="spark-logo">S</div>
+            </div>
+        </div>
+        <!-- Adjusted margin for a more compact layout -->
+        <div class="mt-3 text-center">
+            <button id="spinBtn" class="transition-transform duration-300 transform">Spin to Win!</button>
+        </div>
+    </main>
+
+    <!-- Prize Modal -->
+    <div id="modal" class="hidden">
+        <div id="modal-content">
+            <h3 class="text-2xl font-bold text-white mb-4">Congratulations!</h3>
+            <p id="modal-prize" class="text-3xl font-extrabold mb-4">You Won!</p>
+            <p class="text-slate-400 mb-6">
+                The item would be your Gift, we will add after washing. Book now to claim.
+            </p>
+            <button id="close-modal-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold py-3 px-6 rounded-full transition-colors duration-200">
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Game logic for the spinning wheel
+        const wheelCanvas = document.getElementById('wheelCanvas');
+        const spinBtn = document.getElementById('spinBtn');
+        const modal = document.getElementById('modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const modalPrize = document.getElementById('modal-prize');
+        const ctx = wheelCanvas.getContext('2d');
+        const confettiContainer = document.getElementById('confetti-container');
+
+        // Prizes array, including the ones you mentioned
+        const prizes = [
+            { label: "5 Cedis", color: "#f87171" },       // Red-400
+            { label: "Phone Charger", color: "#60a5fa" }, // Blue-400
+            { label: "Dashboard Wipes", color: "#a78bfa" }, // Purple-400
+            { label: "Pack of Tissue", color: "#2dd4bf" }, // Teal-400
+            { label: "10 Cedis", color: "#facc15" },     // Yellow-400
+            { label: "Hand Sanitizer", color: "#34d399" }, // Green-400
+            { label: "Air Freshener", color: "#f472b6" },  // Pink-400
+            { label: "Screen Cleaner", color: "#c084fc" }  // Violet-400
+        ];
+        
+        let rotation = 0;
+        let spinning = false;
+
+        // Function to draw the wheel
+        function drawWheel() {
+            const arcSize = (2 * Math.PI) / prizes.length;
+            const radius = wheelCanvas.width / 2;
+
+            ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+            
+            prizes.forEach((prize, i) => {
+                const angle = i * arcSize + rotation;
+
+                // Draw the wheel slice
+                ctx.beginPath();
+                ctx.fillStyle = prize.color;
+                ctx.moveTo(radius, radius);
+                ctx.arc(radius, radius, radius, angle, angle + arcSize);
+                ctx.lineTo(radius, radius);
+                ctx.fill();
+
+                // Draw the text
+                ctx.save();
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 14px Inter'; /* Smaller font size */
+                ctx.translate(radius, radius);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = 'right';
+                ctx.fillText(prize.label, radius - 15, 0); /* Adjusted position */
+                ctx.restore();
+            });
+        }
+
+        // Confetti animation function
+        function createConfetti() {
+            const colors = ['#f87171', '#60a5fa', '#a78bfa', '#2dd4bf', '#facc15'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.position = 'absolute';
+                confetti.style.left = `${Math.random() * 100}%`;
+                confetti.style.top = `${Math.random() * 100}%`;
+                confetti.style.transform = `rotate(${Math.random() * 360}deg) scale(${Math.random() * 0.5 + 0.5})`;
+                confetti.style.opacity = Math.random() * 0.8 + 0.2;
+                confetti.style.animation = `confetti-fall ${Math.random() * 2 + 3}s linear infinite`;
+                confettiContainer.appendChild(confetti);
+            }
+
+            confettiContainer.style.opacity = 1;
+        }
+
+        // Animation loop for spinning
+        function animateSpin(start, end, duration) {
+            let startRotation = rotation;
+            let current = start;
+
+            function easeOutQuad(t) {
+                return t * (2 - t);
+            }
+
+            function frame(timestamp) {
+                if (!current) current = timestamp;
+                const elapsed = timestamp - current;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Use an easing function to slow down the spin
+                const easedProgress = easeOutQuad(progress);
+
+                rotation = startRotation + easedProgress * (end - startRotation);
+                drawWheel();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(frame);
+                } else {
+                    // Spin has ended
+                    spinning = false;
+                    spinBtn.disabled = false;
+                    
+                    // --- PRIZE CALCULATION ---
+                    const prizeArcRad = (2 * Math.PI) / prizes.length;
+                    const pointerAngleRad = (3 * Math.PI / 2);
+                    
+                    const finalAngle = (pointerAngleRad - rotation) % (2 * Math.PI);
+                    const normalizedFinalAngle = (finalAngle + 2 * Math.PI) % (2 * Math.PI);
+                    
+                    const prizeIndex = Math.floor(normalizedFinalAngle / prizeArcRad);
+                    const winningPrize = prizes[prizeIndex];
+
+                    // Display the winning prize in the modal
+                    modalPrize.textContent = winningPrize.label;
+                    modal.classList.add('open');
+                    
+                    // Trigger confetti
+                    createConfetti();
+                }
+            }
+            requestAnimationFrame(frame);
+        }
+
+        // Spin the wheel!
+        spinBtn.addEventListener('click', () => {
+            if (spinning) return;
+            spinning = true;
+            spinBtn.disabled = true;
+
+            const totalSpins = 5 + Math.floor(Math.random() * 5); // Spin at least 5 times
+            const winningSlice = Math.floor(Math.random() * prizes.length);
+            const prizeAngleRad = winningSlice * (2 * Math.PI / prizes.length);
+            
+            // Calculate a random final angle within the winning slice
+            const randomOffset = Math.random() * (2 * Math.PI / prizes.length);
+            
+            // The final rotation is the number of full spins + the angle to the winning slice
+            const finalRotation = (totalSpins * 2 * Math.PI) + (2 * Math.PI - (prizeAngleRad + randomOffset));
+            
+            // Add a small initial rotation for a smoother start
+            const startRotation = rotation + (Math.PI / 180);
+            
+            animateSpin(startRotation, finalRotation, 6000); // Spin for 6 seconds
+        });
+
+        // Close the modal
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.remove('open');
+            confettiContainer.innerHTML = '';
+            confettiContainer.style.opacity = 0;
+        });
+
+        // Resize the canvas to be a square and redraw
+        function resizeCanvas() {
+            const container = document.getElementById('wheel-container');
+            const size = Math.min(container.offsetWidth, container.offsetHeight);
+            wheelCanvas.width = size;
+            wheelCanvas.height = size;
+            drawWheel();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        window.onload = () => {
+            modal.classList.remove('hidden'); // Show modal after initial page load
+            resizeCanvas();
+            drawWheel();
+        };
+
+    </script>
+</body>
+</html>

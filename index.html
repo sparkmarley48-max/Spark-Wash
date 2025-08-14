@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Spark Wash — Mobile Car Wash & Detailing</title>
+  <meta name="description" content="Showroom shine delivered to your driveway. Eco-friendly mobile car wash and detailing in CITY. Book online in seconds." />
+  <meta name="theme-color" content="#0F172A" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { DEFAULT: '#3B82F6', dark: '#1D4ED8' },
+            ink: '#0F172A'
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      },
+      darkMode: 'class'
+    }
+  </script>
+  <style>
+    .glass { backdrop-filter: saturate(180%) blur(16px); background: rgba(15,23,42,.7); }
+    .radial { background: radial-gradient(1200px 500px at 10% -20%, rgba(59,130,246,.25), transparent 60%), radial-gradient(1000px 500px at 110% 10%, rgba(34,211,238,.18), transparent 60%); }
+    
+    /* Counter animation styles */
+    .counter-value {
+      transition: transform 0.3s ease-out;
+    }
+    
+    .counter-item {
+      transition: all 0.3s ease;
+    }
+    
+    .counter-item:hover {
+      transform: translateY(-5px);
+    }
+    
+    /* Before/After slider styles */
+    .before-after-container {
+      height: 300px;
+      user-select: none;
+    }
+    
+    .after-image {
+      clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+      transition: clip-path 0.1s ease;
+    }
+    
+    .slider-handle {
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    
+    .handle-circle {
+      transform: translateX(-50%);
+      transition: transform 0.2s ease;
+    }
+    
+    .slider-handle:hover .handle-circle {
+      transform: translateX(-50%) scale(1.1);
+    }
+    
+    /* Charity banner animations */
+    @keyframes pulse-subtle {
+      0% { transform: scale(1); opacity: 0.95; }
+      50% { transform: scale(1.02); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.95; }
+    }
+    
+    .animate-pulse-subtle {
+      animation: pulse-subtle 3s infinite ease-in-out;
+    }
+    
+    .charity-banner {
+      transition: all 0.5s ease;
+    }
+    
+    .charity-text {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .charity-text::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+      0% { left: -100%; }
+      20% { left: 100%; }
+      100% { left: 100%; }
+    }
+    
+    /* Charity message animation */
+    @keyframes pulse-subtle {
+      0% { opacity: 0.9; }
+      50% { opacity: 1; }
+      100% { opacity: 0.9; }
+    }
+    
+    .animate-pulse-subtle {
+      animation: pulse-subtle 2s infinite ease-in-out;
+    }
+  </style>
+  <meta property="og:title" content="Spark Wash — Mobile Car Wash & Detailing" />
+  <meta property="og:description" content="Premium mobile detailing in CITY. Book online in seconds." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://your-domain.com" />
+  <meta property="og:image" content="https://your-domain.com/og.jpg" />
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"LocalBusiness",
+    "name":"Spark Wash<",
+    "image":"https://your-domain.com/logo.png",
+    "url":"https://your-domain.com",
+    "telephone":"+233551389510",
+    "address":{"@type":"PostalAddress","addressLocality":"CITY","addressRegion":"STATE"},
+    "areaServed":"CITY and surrounding areas",
+    "priceRange":"$$",
+    "openingHours":"Mo,Tu,We,Th,Fr,Sa 08:00-18:00"
+  }
+  </script>
+</head>
+<body class="font-sans text-slate-100 bg-ink antialiased">
+
+    
+  <!-- Header -->
+  <header class="fixed inset-x-0 top-0 z-50">
+    <div class="mx-auto max-w-7xl px-4">
+      <div class="mt-4 flex items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 backdrop-blur-md">
+        <a href="#" class="flex items-center gap-2">
+          <div class="h-8 w-8 rounded-lg bg-brand"></div>
+          <span class="text-base font-semibold tracking-tight">Spark Wash</span>
+        </a>
+        <!-- Hamburger menu button for mobile -->
+        <button id="mobile-menu-button" class="md:hidden text-slate-300 hover:text-white focus:outline-none">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        <!-- Desktop navigation -->
+        <nav id="desktop-nav" class="hidden gap-6 md:flex text-sm text-slate-300">
+          <a href="#services" class="hover:text-white">Services</a>
+          <a href="#gallery" class="hover:text-white">Gallery</a>
+          <a href="our-story.html" class="hover:text-white">Our Story</a>
+          <a href="#faq" class="hover:text-white">FAQ</a>
+        </nav>
+        <div class="flex items-center gap-2">
+          <a href="tel:PHONE_NUMBER" class="hidden rounded-lg border border-white/10 px-3 py-2 text-sm text-slate-300 hover:text-white md:block">Call</a>
+          <a href="booking.html" class="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:bg-brand-dark">Book Now</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile menu (initially hidden) -->
+  <div id="mobile-menu" class="hidden md:hidden fixed inset-x-0 top-16 z-40 bg-ink/90 backdrop-blur-md py-4 px-4">
+    <nav class="flex flex-col gap-4 text-sm text-slate-300">
+      <a href="#services" class="block hover:text-white py-2">Services</a>
+      <a href="#gallery" class="block hover:text-white py-2">Gallery</a>
+      <a href="our-story.html" class="block hover:text-white py-2">Our Story</a>
+      <a href="#faq" class="block hover:text-white py-2">FAQ</a>
+      <a href="tel:PHONE_NUMBER" class="block rounded-lg border border-white/10 px-3 py-2 text-center text-slate-300 hover:text-white mt-2">Call</a>
+      <a href="booking.html" class="block rounded-lg bg-brand px-4 py-2 text-center font-semibold text-white hover:bg-brand-dark">Book Now</a>
+    </nav>
+  </div>
+
+  <!-- Remove this entire charity banner section -->
+  <!-- <div class="charity-banner fixed top-20 left-0 right-0 z-40 mx-auto max-w-xs px-4 py-2"> 
+    <div class="rounded-xl border-2 border-emerald-400 bg-gradient-to-r from-emerald-900/80 to-emerald-700/80 p-3 backdrop-blur-sm shadow-lg animate-pulse-subtle">
+      <div class="flex items-center justify-center gap-3">
+        <div class="flex items-center justify-center h-12 w-12 rounded-full bg-emerald-500/30 text-white">
+          <span class="text-2xl font-bold">₵1</span>
+        </div>
+        <p class="text-white font-semibold text-center charity-text"> 
+          Every wash contributes ₵1 to charities & causes. 
+          <a href="see proof.html" class="underline text-blue-300 hover:text-blue-400">
+            See Proof
+          </a>
+        </p>
+      </div>
+    </div>
+  </div> -->
+
+  <!-- Updated Hero Section -->
+  <section class="relative isolate overflow-hidden pt-28 pb-20 radial">
+      <div class="mx-auto max-w-7xl px-4">
+          <div class="grid items-center gap-10 md:grid-cols-2">
+              <div>
+                  <!-- Charity message - larger and positioned above eco-friendly text -->
+                  <!-- Updated Charity Message -->
+                  <div class="mb-4 text-lg font-bold text-center text-emerald-300 animate-pulse-subtle">
+                      ₵1 Every wash contributes to local charities & causes
+                      <a href="see proof.html" class="underline text-blue-300 hover:text-blue-400">See Proof</a>
+                  </div>
+                  <span class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                      <svg class="h-3.5 w-3.5 text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path d="M16.704 5.29a1 1 0 010 1.415l-7.5 7.5a1 1 0 01-1.415 0l-3-3a1 1 0 111.415-1.415l2.292 2.293 6.793-6.793a1 1 0 011.415 0z"/></svg>
+                      Eco-friendly • Insured • Mobile
+                  </span>
+                  <h1 class="text-4xl font-extrabold leading-[1.1] sm:text-5xl">Showroom shine, delivered to your driveway</h1>
+                  <p class="mt-4 text-slate-300">Premium mobile car wash and detailing in CITY that fits your schedule. We bring the water, power, and pro-grade products. Eco-friendly mobile detailing SparkWash saves up to 100 liters of water per wash with advanced steam and rinse-less techniques. We bring premium detailing to your driveway using biodegradable products and efficient processes.</p>
+                  <div class="mt-6 flex flex-wrap gap-3">
+                      <a href="booking.html" class="rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark">Book Now</a>
+                      <a href="#services" class="rounded-xl border border-white/10 px-5 py-3 text-slate-200 hover:border-white/20">See Packages</a>
+                  </div>
+                  <div class="mt-6 flex items-center gap-3 text-sm text-slate-400">
+                      <div class="flex items-center gap-1">
+                          <span class="text-yellow-400">★★★★★</span>
+                          <span>4.9 on Google</span>
+                      </div>
+                      <span>•</span>
+                      <span>100% Satisfaction Guarantee</span>
+                  </div>
+              </div>
+              <div class="relative">
+                  <div class="aspect-[4/3] overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+                    <video autoplay muted loop class="h-full w-full object-cover">
+  <source src="images\INTRO.mp4" type="video/mp4" />
+  Your browser does not support the video tag.
+</video>
+
+                  </div>
+              </div>
+          </div>
+      </div>
+      <div class="pointer-events-none absolute inset-0 -z-10 opacity-20" aria-hidden="true"></div>
+  </section>
+
+  <!-- Hero section ends here -->
+  </section>
+  
+  <!-- Stats Counter Section -->
+  <section class="mx-auto max-w-7xl px-4 py-12 bg-white/5 rounded-2xl border border-white/10 my-8">
+    <h2 class="mb-6 text-2xl font-bold text-center">Vehicles Serviced</h2>
+    <div class="grid gap-6 sm:grid-cols-4 text-center">
+      <div class="p-5">
+        <div class="text-4xl font-extrabold text-brand mb-2">
+          <span class="counter" data-target="1250">7005</span>+
+        </div>
+        <p class="text-slate-300">Electric Cars</p>
+      </div>
+      <div class="p-5">
+        <div class="text-4xl font-extrabold text-brand mb-2">
+          <span class="counter" data-target="3450">250</span>+
+        </div>
+        <p class="text-slate-300">Fuel Cars</p>
+      </div>
+      <div class="p-5">
+        <div class="text-4xl font-extrabold text-brand mb-2">
+          <span class="counter" data-target="780">440</span>+
+        </div>
+        <p class="text-slate-300">Bikes</p>
+      </div>
+      <div class="p-5">
+        <div class="text-4xl font-extrabold text-brand mb-2">
+          <span class="counter" data-target="520">200</span>+
+        </div>
+        <p class="text-slate-300">Trucks</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold">How it works</h2>
+    <div class="grid gap-6 sm:grid-cols-3">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="mb-3 h-10 w-10 rounded-lg bg-brand/20 text-brand flex items-center justify-center">1</div>
+        <h3 class="font-semibold">Book online</h3>
+        <p class="mt-1 text-sm text-slate-300">Choose your package, add-ons, and a time that works for you.</p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="mb-3 h-10 w-10 rounded-lg bg-brand/20 text-brand flex items-center justify-center">2</div>
+        <h3 class="font-semibold">We come to you</h3>
+        <p class="mt-1 text-sm text-slate-300">Fully equipped. No water or power needed from you unless neccessary/available.</p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="mb-3 h-10 w-10 rounded-lg bg-brand/20 text-brand flex items-center justify-center">3</div>
+        <h3 class="font-semibold">Drive happy</h3>
+        <p class="mt-1 text-sm text-slate-300">Pay securely. Enjoy that fresh, glossy finish.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section id="services" class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold">Packages</h2>
+    <div class="grid gap-6 md:grid-cols-3">
+      <!-- Quick Wash -->
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h3 class="text-lg font-semibold">Quick Wash</h3>
+        <p class="mt-1 text-sm text-slate-300">Foam wash, wheels, windows, quick interior wipe.</p>
+        <p class="mt-4 text-3xl font-extrabold">Ȼ 40.00</p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-300">
+          <li>• Hand wash + dry</li>
+          <li>• Wheel clean + tire shine</li>
+          <li>• Windows in/out</li>
+        </ul>
+        <a href="booking.html?pkg=quick" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark">Book</a>
+      </div>
+      <!-- Deluxe Detail -->
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6 ring-2 ring-brand/40">
+        <h3 class="text-lg font-semibold">Deluxe Detail</h3>
+        <p class="mt-1 text-sm text-slate-300">Exterior + interior vacuum, wipe-down, plastics dressed.</p>
+        <p class="mt-4 text-3xl font-extrabold">Ȼ 90.00</p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-300">
+          <li>• Everything in Quick</li>
+          <li>• Interior vacuum + wipe</li>
+          <li>• Door jambs, vents, console</li>
+        </ul>
+        <a href="booking.html?pkg=deluxe" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark">Book</a>
+      </div>
+      <!-- Full Detail -->
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h3 class="text-lg font-semibold">Full Detail</h3>
+        <p class="mt-1 text-sm text-slate-300">Deep interior shampoo + clay bar + wax protection.</p>
+        <p class="mt-4 text-3xl font-extrabold">Ȼ 150.00</p>
+        <ul class="mt-4 space-y-2 text-sm text-slate-300">
+          <li>• Steam clean + shampoo</li>
+          <li>• Clay bar + wax</li>
+          <li>• Pet hair + stains (light)</li>
+        </ul>
+        <a href="booking.html?pkg=full" class="mt-6 inline-block rounded-xl bg-brand px-4 py-2 font-semibold text-white hover:bg-brand-dark">Book</a>
+      </div>
+    </div>
+
+    <!-- Add-ons -->
+    <div class="mt-10">
+      <h3 class="mb-3 font-semibold">Popular add-ons</h3>
+      <div class="flex flex-wrap gap-2 text-sm text-slate-300">
+        <span class="rounded-full border border-white/10 px-3 py-1">Headlight Restore +Ȼ 40.00</span>
+        <span class="rounded-full border border-white/10 px-3 py-1">Engine Bay +Ȼ 50.00</span>
+        <span class="rounded-full border border-white/10 px-3 py-1">Ceramic Spray +Ȼ 60.000</span>
+        <span class="rounded-full border border-white/10 px-3 py-1">Odor/Ozone +Ȼ 40.00</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gallery with Before/After Slider -->  
+  <section id="gallery" class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold">Before & After</h2>
+    <p class="text-slate-300 mb-6">Drag the slider to see the transformation</p>
+    
+    <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- First Before/After Slider -->  
+      <div class="before-after-container rounded-xl border border-white/10 overflow-hidden relative">
+        <div class="before-image w-full h-full">
+          <img src="images/1.jpg" alt="Dirty car" class="w-full h-full object-cover" />
+        </div>
+        <div class="after-image w-full h-full absolute top-0 left-0">
+          <img src="images/2.jpg" alt="Clean car" class="w-full h-full object-cover" />
+          <div class="slider-handle absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize flex items-center justify-center">
+            <div class="handle-circle w-8 h-8 rounded-full bg-brand flex items-center justify-center shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5l-7 7 7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="labels absolute top-4 left-0 right-0 flex justify-between px-4 pointer-events-none">
+          <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">Before</span>
+          <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">After</span>
+        </div>
+      </div>
+      
+      <!-- Second Before/After Slider -->  
+      <div class="before-after-container rounded-xl border border-white/10 overflow-hidden relative">
+        <div class="before-image w-full h-full">
+          <img src="images/3.jpg" alt="Dirty car interior" class="w-full h-full object-cover" />
+        </div>
+        <div class="after-image w-full h-full absolute top-0 left-0">
+          <img src="images/4.jpg" alt="Clean car interior" class="w-full h-full object-cover" />
+          <div class="slider-handle absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize flex items-center justify-center">
+            <div class="handle-circle w-8 h-8 rounded-full bg-brand flex items-center justify-center shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5l-7 7 7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="labels absolute top-4 left-0 right-0 flex justify-between px-4 pointer-events-none">
+          <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">Before</span>
+          <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">After</span>
+        </div>
+      </div>
+      
+      <!-- Third Before/After Slider -->  
+      <div class="before-after-container rounded-xl border border-white/10 overflow-hidden relative">
+        <div class="before-image w-full h-full">
+          <img src="images/5.jpg" alt="Dirty car exterior" class="w-full h-full object-cover" />
+        </div>
+        <div class="after-image w-full h-full absolute top-0 left-0">
+          <img src="images/6.jpg" alt="Clean car exterior" class="w-full h-full object-cover" />
+          <div class="slider-handle absolute top-0 bottom-0 w-1 bg-white cursor-ew-resize flex items-center justify-center">
+            <div class="handle-circle w-8 h-8 rounded-full bg-brand flex items-center justify-center shadow-lg">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5l-7 7 7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="labels absolute top-4 left-0 right-0 flex justify-between px-4 pointer-events-none">
+          <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">Before</span>
+          <span class="bg-black/50 text-white text-xs px-2 py-1 rounded">After</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Picture Gallery Section -->
+  <section id="photo-gallery" class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold">Our Work Gallery</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <!-- Gallery Image 1 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\ozone.jpg" />
+      </div>
+      <!-- Gallery Image 2 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\DETAILING-dashboard.jpg" />
+      </div>
+      <!-- Gallery Image 3 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\auto-detailing- 1.jpg" alt="car detail" class="w-full h-full object-cover" />
+      </div>
+      <!-- Gallery Image 4 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\detail 3.avif" alt="Car wash process" class="w-full h-full object-cover" />
+      </div>
+      <!-- Gallery Image 5 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\car steer.webp" alt="Polishing" class="w-full h-full object-cover" />
+      </div>
+      <!-- Gallery Image 6 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\ozone-1.jpg" />
+      </div>
+      <!-- Gallery Image 7 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\before-and-after-ppf-application.webp" alt="Engine bay cleaning" class="w-full h-full object-cover" />
+      </div>
+      <!-- Gallery Image 8 -->
+      <div class="overflow-hidden rounded-xl border border-white/10 aspect-square hover:scale-[1.02] transition-transform duration-300">
+        <img src="images\get-your-car-engine-bay-detailed.jpg" alt="Finished detail" class="w-full h-full object-cover" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Reviews -->
+  <section id="reviews" class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold">What customers say</h2>
+    <div class="grid gap-6 md:grid-cols-3">
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="text-yellow-400">★★★★★</div>
+        <p class="mt-2 text-sm text-slate-300">“They made my SUV look brand new. Super convenient!”</p>
+        <p class="mt-3 text-xs text-slate-400">— Alex M.</p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="text-yellow-400">★★★★★</div>
+        <p class="mt-2 text-sm text-slate-300">“On time, professional, and the results were insane.”</p>
+        <p class="mt-3 text-xs text-slate-400">— Priya S.</p>
+      </div>
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div class="text-yellow-400">★★★★★</div>
+        <p class="mt-2 text-sm text-slate-300">“Booked on my lunch break. Worth every penny.”</p>
+        <p class="mt-3 text-xs text-slate-400">— Jordan R.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Service Area -->
+  <section class="mx-auto max-w-7xl px-4 py-12">
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 class="text-2xl font-bold">Service area</h2>
+          <p class="mt-1 text-sm text-slate-300">We serve CITY and nearby ZIPs. Check if we come to you:</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <input id="zip" placeholder="Enter ZIP" class="w-40 rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm outline-none placeholder:text-slate-400" />
+          <button onclick="checkZip()" class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold">Check</button>
+        </div>
+      </div>
+      <p id="zipResult" class="mt-3 text-sm"></p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold">FAQ</h2>
+    <div class="space-y-4">
+      <details class="group rounded-2xl border border-white/10 bg-white/5 p-4">
+        <summary class="cursor-pointer list-none font-semibold">Do you need water or power?</summary>
+        <p class="mt-2 text-sm text-slate-300">Nope — we’re fully self-contained. But depends on what best for you</p>
+      </details>
+      <details class="group rounded-2xl border border-white/10 bg-white/5 p-4">
+        <summary class="cursor-pointer list-none font-semibold">What’s your cancel policy?</summary>
+        <p class="mt-2 text-sm text-slate-300">Free 24+ hours before. Same-day cancellations may lose part of your deposit. But we allow rescheduling</p>
+      </details>
+      <details class="group rounded-2xl border border-white/10 bg-white/5 p-4">
+        <summary class="cursor-pointer list-none font-semibold">Bad weather?</summary>
+        <p class="mt-2 text-sm text-slate-300">We prepared for all weather conditions, we can reschedule as well.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Spin the Wheel Feature -->
+  <section class="mx-auto max-w-7xl px-4 py-12">
+    <h2 class="mb-6 text-2xl font-bold text-center">Spin to Win!</h2>
+    <iframe src="wheel.html" width="100%" height="500" style="border:none; border-radius:20px; overflow:hidden;"></iframe>
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-7xl px-4 pb-24">
+    <div class="rounded-2xl border border-white/10 bg-gradient-to-r from-brand/20 to-cyan-400/20 p-8">
+      <div class="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+        <div>
+          <h3 class="text-xl font-bold">Ready for that fresh detail?</h3>
+          <p class="mt-1 text-slate-300">Book in under 60 seconds — we’ll handle the rest.</p>
+        </div>
+        <div class="flex gap-3">
+          <a href="booking.html" class="rounded-xl bg-brand px-5 py-3 font-semibold text-white hover:bg-brand-dark">Book Now</a>
+         <a href="https://wa.me/233551389510?text=Hello%20Sparks%2C%20I%20need%20to%20make%20enquiries"
+   class="rounded-xl border border-white/10 px-5 py-3 font-semibold text-slate-200">
+   Chat on WhatsApp
+</a>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+ 
+
+  <!-- Sticky mobile CTA -->
+  <div class="fixed inset-x-0 bottom-3 z-50 mx-auto w-[92%] rounded-2xl glass px-4 py-3 backdrop-blur md:hidden">
+    <div class="flex items-center justify-between">
+      <div class="text-sm">
+        <div class="font-semibold">On-site Mobile Detailing</div>
+        <div class="text-slate-300">Book in 60 seconds</div>
+      </div>
+      <a href="booking.html" class="rounded-xl bg-brand px-4 py-2 text-sm font-semibold">Book</a>
+    </div>
+  </div>
+
+  <script>
+    const SERVED_ZIPS = ['90210','90024','90025']; // TODO: your ZIPs
+    function checkZip() {
+      const el = document.getElementById('zip');
+      const result = document.getElementById('zipResult');
+      const zip = (el.value || '').trim();
+      if (!zip) return;
+      if (SERVED_ZIPS.includes(zip)) {
+        result.textContent = `Yes — we service ${zip}. Book now!`;
+        result.className = 'mt-3 text-sm text-emerald-400';
+      } else {
+        result.textContent = `We don't currently service ${zip}. Message us — we may waive a travel fee.`;
+        result.className = 'mt-3 text-sm text-amber-300';
+      }
+    }
+    document.getElementById('year').textContent = new Date().getFullYear();
+    
+    // Counter animation
+    const counters = document.querySelectorAll('.counter');
+    const speed = 200; // The lower the faster
+    
+    // Function to start counter animation when element is in viewport
+    function startCounterWhenVisible() {
+      counters.forEach(counter => {
+        const position = counter.getBoundingClientRect();
+        
+        // Check if element is in viewport
+        if(position.top >= 0 && position.bottom <= window.innerHeight) {
+          const target = parseInt(counter.getAttribute('data-target'));
+          const count = parseInt(counter.innerText);
+          const increment = Math.trunc(target / speed);
+          
+          if(count < target) {
+            counter.innerText = count + increment;
+            setTimeout(() => startCounterWhenVisible(), 1);
+          } else {
+            counter.innerText = target;
+          }
+        }
+      });
+    }
+    
+    // Start animation when scrolled into view
+    window.addEventListener('scroll', startCounterWhenVisible);
+    // Also run once on page load
+    window.addEventListener('load', startCounterWhenVisible);
+  </script>
+</body>
+</html>
+
+    </div>
+  </div>
+  
+  <script>
+    // Make charity banner visible after scrolling down a bit
+    window.addEventListener('scroll', function() {
+      const banner = document.querySelector('.charity-banner');
+      if (window.scrollY > 100) {
+        banner.style.top = '0.5rem';
+      } else {
+        banner.style.top = '5rem';
+      }
+    });
+  </script>
+</body>
+</html>
+
+    </div>
+  </div>
+  
+  <script>
+    // Before/After slider functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const containers = document.querySelectorAll('.before-after-container');
+      
+      containers.forEach(container => {
+        const afterImage = container.querySelector('.after-image');
+        const sliderHandle = container.querySelector('.slider-handle');
+        let isDragging = false;
+        
+        // Set initial position (50%)
+        updateSliderPosition(container, 50);
+        
+        // Mouse events
+        sliderHandle.addEventListener('mousedown', startDrag);
+        container.addEventListener('mousemove', drag);
+        window.addEventListener('mouseup', endDrag);
+        
+        // Touch events for mobile
+        sliderHandle.addEventListener('touchstart', startDrag);
+        container.addEventListener('touchmove', drag);
+        window.addEventListener('touchend', endDrag);
+        
+        // Click anywhere on container to move slider
+        container.addEventListener('click', function(e) {
+          if (e.target !== sliderHandle && !sliderHandle.contains(e.target)) {
+            const rect = container.getBoundingClientRect();
+            const position = ((e.clientX - rect.left) / rect.width) * 100;
+            updateSliderPosition(container, position);
+          }
+        });
+        
+        function startDrag(e) {
+          e.preventDefault();
+          isDragging = true;
+        }
+        
+        function drag(e) {
+          if (!isDragging) return;
+          e.preventDefault();
+          
+          const rect = container.getBoundingClientRect();
+          let clientX;
+          
+          if (e.type === 'touchmove') {
+            clientX = e.touches[0].clientX;
+          } else {
+            clientX = e.clientX;
+          }
+          
+          const position = ((clientX - rect.left) / rect.width) * 100;
+          updateSliderPosition(container, position);
+        }
+        
+        function endDrag() {
+          isDragging = false;
+        }
+        
+        function updateSliderPosition(container, position) {
+          // Constrain position between 0 and 100
+          position = Math.max(0, Math.min(position, 100));
+          
+          const afterImage = container.querySelector('.after-image');
+          const sliderHandle = container.querySelector('.slider-handle');
+          
+          // Update clip path to reveal the after image
+          afterImage.style.clipPath = `polygon(${position}% 0, 100% 0, 100% 100%, ${position}% 100%)`;
+          
+          // Update slider handle position
+          sliderHandle.style.left = `${position}%`;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
+
+<!-- Water Savings & Eco Impact Counter -->
+<section class="mx-auto max-w-7xl px-4 py-12 bg-white/5 rounded-2xl border border-white/10 my-8">
+    <h2 class="mb-6 text-2xl font-bold text-center">Water Savings & Eco Impact</h2>
+    <div class="text-center">
+        <div class="text-4xl font-extrabold text-brand mb-2">
+            <span id="total-water-saved">0</span> liters
+        </div>
+        <p class="text-slate-300">You saved <span id="last-wash-saved">0</span> liters with your last wash!</p>
+    </div>
+</section>
+
+<section class="mx-auto max-w-7xl px-4 py-12 bg-white/5 rounded-2xl border border-white/10 my-8">
+    <h2 class="text-2xl font-bold text-center">Eco-Friendly Certifications</h2>
+    <div class="grid gap-6 sm:grid-cols-3 mt-8">
+        <div class="text-center">
+            <img src="images/certification1.jpg" alt="Certification 1" class="mx-auto w-68 h-48">
+            <p class="mt-4 text-sm text-slate-300">Personal Action 1</p>
+        </div>
+        <div class="text-center">
+            <img src="images/certification2.jpg" alt="Certification 2" class="mx-auto w-68 h-48">
+            <p class="mt-4 text-sm text-slate-300">Personal Action 2</p>
+        </div>
+        <div class="text-center">
+            <img src="images/certification3.jpg" alt="Certification 3" class="mx-auto w-68 h-48">
+            <p class="mt-4 text-sm text-slate-300">Certification 3</p>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Example JavaScript for live counter
+    const totalWaterSaved = document.getElementById('total-water-saved');
+    const lastWashSaved = document.getElementById('last-wash-saved');
+
+    // Simulated data (replace with real data from your backend or API)
+    let totalSaved = 12500; // Total liters saved
+    let lastSaved = 100; // Last wash liters saved
+
+    // Update counters
+    totalWaterSaved.textContent = totalSaved;
+    lastWashSaved.textContent = lastSaved;
+
+    // Optional: Add animation or real-time updates
+</script>
+</body>
+</html>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuButton = document.getElementById('mobile-menu-button');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      mobileMenuButton.addEventListener('click', function() {
+        mobileMenu.classList.toggle('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
