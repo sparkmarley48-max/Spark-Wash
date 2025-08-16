@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Chatbot Widget</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Container for the floating chatbot */
+        #chatbot-container {
+            position: fixed;
+            bottom: 6rem; /* Position above the toggle button */
+            right: 1.5rem;
+            z-index: 1000;
+            width: 100%;
+            max-width: 400px; /* Limit max width for desktop */
+            background-color: #021a4b; /* slate-800 */
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            transform: translateY(100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* State for when the chatbot is open */
+        #chatbot-container.open {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* The floating toggle button */
+        #chatbot-toggle-btn {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 1001;
+            background-color: #6366f1; /* indigo-500 */
+            color: white;
+            width: 4rem;
+            height: 4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px 5px rgba(99, 102, 241, 0.6); /* Initial glow */
+            animation: glowing 2s infinite ease-in-out;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        #chatbot-toggle-btn:hover {
+            transform: scale(1.1);
+            animation-play-state: paused; /* Pause glow on hover */
+        }
+        
+        /* Keyframes for the glowing animation */
+        @keyframes glowing {
+            0% {
+                box-shadow: 0 0 10px 5px rgba(99, 102, 241, 0.6);
+            }
+            50% {
+                box-shadow: 0 0 20px 10px rgba(99, 102, 241, 0.8), 0 0 30px 15px rgba(99, 102, 241, 0.4);
+            }
+            100% {
+                box-shadow: 0 0 10px 5px rgba(99, 102, 241, 0.6);
+            }
+        }
+        
+        /* Loading state for the toggle button */
+        #chatbot-toggle-btn.loading {
+            cursor: progress;
+            animation: pulse-bg 1s infinite; /* A distinct loading animation */
+            box-shadow: none; /* Turn off the glowing effect */
+        }
+
+        /* Loading background animation */
+        @keyframes pulse-bg {
+            0% { background-color: #6366f1; }
+            50% { background-color: #4338ca; }
+            100% { background-color: #6366f1; }
+        }
+
+        /* General chatbot styles */
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #6366f1; /* indigo-500 */
+        }
+        
+        .chat-message {
+            background-color: #334155; /* slate-700 */
+            padding: 1rem;
+            border-radius: 1rem;
+            text-align: left;
+        }
+        
+        .chat-message.ai-message {
+            background-color: #0f172a; /* slate-900 */
+            border: 1px solid #334155;
+              /* Add this line to set text color to white */
+    color: #fff;
+        }
+
+        .loader {
+            border: 4px solid #1e293b;
+            border-top: 4px solid #6366f1;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #responseArea {
+            max-height: 250px; /* Set a fixed height for scrolling */
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+        }
+
+        /* Responsive adjustments for mobile */
+        @media (max-width: 640px) {
+            #chatbot-container {
+                right: 0.5rem;
+                bottom: 5.5rem;
+                max-width: calc(100% - 1rem); /* Full width on smaller screens */
+            }
+            
+            #chatbot-toggle-btn {
+                right: 0.5rem;
+                bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Floating Chatbot Toggle Button -->
+    <button id="chatbot-toggle-btn" aria-label="Open chat widget">
+        <!-- SVG Chat icon -->
+        <svg id="toggle-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.144.945 2.062 2.106 2.062h.166l.764.764a.75.75 0 001.272.235l2.064-2.064a.75.75 0 01.442-.298l.582-.146a.75.75 0 00.758-.168l1.458-1.458a.75.75 0 01.53-.22h.004a.75.75 0 01.53.22l1.458 1.458a.75.75 0 00.758.168l.582.146a.75.75 0 01.442.298l2.064 2.064a.75.75 0 001.272-.235l.764-.764h.166c1.161 0 2.106-.918 2.106-2.062V6.51c0-1.144-.945-2.062-2.106-2.062H4.356C3.195 4.448 2.25 5.366 2.25 6.51v6.25z" />
+        </svg>
+    </button>
+
+    <!-- Floating Chatbot Container -->
+    <div id="chatbot-container">
+        <div class="flex flex-col items-center mb-6">
+            <img src="https://placehold.co/80x80/6366f1/ffffff?text=Alex" alt="Technician's photo" class="avatar mb-4">
+            <h3 class="text-xl font-bold text-white mb-1">Meet Alex, Your Car Care Pro</h3>
+            <p class="text-sm text-slate-400">
+                Alex has been with us for 5 years and is a master of all things car wash.
+            </p>
+        </div>
+
+        <div class="mb-4">
+            <p class="text-sm text-slate-400 mb-2">
+                Ask a question about car care!
+            </p>
+            <input type="text" id="questionInput" placeholder="Type your question here..." class="w-full bg-slate-700 rounded-lg p-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button id="askBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded-full mt-3 text-sm transition-colors duration-300">
+                Ask
+            </button>
+        </div>
+
+        <!-- Response Area -->
+        <div id="responseArea">
+            <div id="initialMessage" class="chat-message ai-message">
+                <p class="text-slate-300 text-sm">Hi there! Ask me anything about car washing or detailing, and I'll do my best to help you out.</p>
+            </div>
+            <div id="loadingIndicator" class="hidden flex justify-center items-center mt-4">
+                <div class="loader"></div>
+            </div>
+        </div>
+        
+        <p class="text-xs text-slate-500 mt-4 text-center">
+            *Please note: Responses are generated by AI.
+        </p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatbotContainer = document.getElementById('chatbot-container');
+            const toggleBtn = document.getElementById('chatbot-toggle-btn');
+            const questionInput = document.getElementById('questionInput');
+            const askBtn = document.getElementById('askBtn');
+            const responseArea = document.getElementById('responseArea');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const toggleIcon = document.getElementById('toggle-icon');
+
+            // Placeholder business knowledge for the RAG system
+            // The text has been formatted into a clean, multi-line string to prevent syntax errors.
+            const businessKnowledge = `
+                ### Spark Wash Business Knowledge Base
+
+                Spark Wash is a mobile car wash and detailing service. We bring car cleaning to customers at their home, office, or location of choice. We focus on convenience, eco-friendly cleaning, and professional results. Services are available by appointment booking through our website, phone, or chatbot.
+
+                ### Services Offered
+                * **Basic Wash**: Exterior wash, tire shine, and a quick interior vacuum.
+                * **Deluxe Wash**: Includes everything in the Basic Wash plus wax, window cleaning, and a dashboard wipe.
+                * **Premium Detail**: Our full-service package with a complete wash, wax, interior shampoo, deep clean, leather care, and detailed tire and rim cleaning.
+                * **Custom Add-ons**: We offer add-ons like engine cleaning, pet hair removal, odor treatment, and ceramic coating.
+
+                ### Spark Wash Packages & Rates 💰 (in Ghana Cedis)
+                * **Essential Clean (Basic Wash)**: ₵40 – ₵150
+                    * Perfect for a quick refresh inside and out.
+                * **Shine & Protect (Deluxe Wash)**: ₵160 – ₵300
+                    * Adds wax and detailed interior care for extra protection and sparkle.
+                * **Ultimate Detail (Premium Detail)**: ₵350 – ₵1,000
+                    * Full-service deep clean with shampooing, leather care, and a showroom finish.
+                * **Custom Add-ons**: ₵50 – ₵350 each
+
+                ### Booking & Payment
+                * Appointments can be booked via our website, chatbot, or phone.
+                * We accept Cash, Mobile Money (MTN MoMo, Vodafone Cash, AirtelTigo), and bank transfer.
+                * We recommend booking at least 24 hours in advance. Same-day service is subject to availability.
+                * For mobile services, customers must provide a safe parking space with access for our wash team.
+
+                ### FAQs
+                * **Q: Do I need to provide water or electricity?**
+                * **A:** No, Spark Wash is fully equipped with our own water and power supply unless the need be.
+
+                * **Q: How long does a car wash take?**
+                * **A:** Between 30 minutes and 2 hours, depending on the package you choose.
+
+                * **Q: Can you wash at my workplace?**
+                * **A:** Yes, thats what we built for, as long as parking and space are available.
+
+                * **Q: Do you wash large vehicles (SUVs, trucks, vans)?**
+                * **A:** Yes, we do! Prices may vary depending on the size of the vehicle.
+            `;
+
+            // Function to handle the API call with exponential backoff
+            async function callGeminiApi(prompt, retries = 0) {
+                // To use this in your personal project, you need to replace "YOUR_API_KEY_HERE"
+                // with a valid API key from your Google Cloud Console or Google AI Studio.
+                // Our system's key will not work in your local environment due to domain restrictions.
+                const apiKey = "AIzaSyBfyeioijtuTAO1Vig2r-b-82NmYIZQOHg";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                };
+
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 429 && retries < 5) {
+                            const delay = Math.pow(2, retries) * 1000 + Math.random() * 1000;
+                            return new Promise(resolve => setTimeout(() => resolve(callGeminiApi(prompt, retries + 1)), delay));
+                        }
+                        throw new Error(`API call failed with status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    return result;
+
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    return null;
+                }
+            }
+
+            // Function to handle user question and display response
+            async function askQuestion() {
+                const question = questionInput.value.trim();
+                if (!question) {
+                    return;
+                }
+                
+                // Add user message to the chat
+                const userMessage = document.createElement('div');
+                userMessage.classList.add('chat-message', 'bg-slate-700', 'text-right');
+                userMessage.innerHTML = `<p class="text-slate-300 text-sm">${question}</p>`;
+                responseArea.appendChild(userMessage);
+
+                // Show loading indicator in the chat window
+                loadingIndicator.classList.remove('hidden');
+                
+                // Disable the ask button and show loading effect
+                askBtn.disabled = true;
+                toggleBtn.classList.add('loading');
+                toggleIcon.style.animation = 'spin 1.5s linear infinite';
+                
+                // Scroll to the bottom to show the user's message
+                responseArea.scrollTop = responseArea.scrollHeight;
+                
+                // Updated RAG prompt with markdown instructions
+                let augmentedPrompt = `You are a professional car wash technician named Alex with 5 years of experience. Your tone is friendly, knowledgeable, and helpful. Answer the following car care question concisely, as if you are giving advice to a customer. Use the provided business knowledge to inform your answer. Format your response professionally using Markdown, including paragraphs, bold text, and bullet points where appropriate.
+
+                Business Knowledge:
+                """
+                ${businessKnowledge}
+                """
+
+                Question: "${question}"
+                Answer:`;
+
+                try {
+                    const result = await callGeminiApi(augmentedPrompt);
+                    let answer = "Sorry, I couldn't find an answer for that right now. Please try again later!";
+                    if (result && result.candidates && result.candidates.length > 0 &&
+                        result.candidates[0].content && result.candidates[0].content.parts &&
+                        result.candidates[0].content.parts.length > 0) {
+                        answer = result.candidates[0].content.parts[0].text;
+                    }
+                    
+                    // Display the AI response
+                    const responseMessage = document.createElement('div');
+                    responseMessage.classList.add('chat-message', 'ai-message');
+                    // Use a library to render markdown as HTML
+                    responseMessage.innerHTML = marked.parse(answer);
+                    responseArea.appendChild(responseMessage);
+                    
+                } catch (error) {
+                    console.error("Error during question-answer process:", error);
+                    const errorMessage = "An error occurred. Please try again.";
+                    const errorDiv = document.createElement('div');
+                    errorDiv.classList.add('chat-message', 'ai-message');
+                    errorDiv.innerHTML = `<p class="text-slate-300 text-red-400 text-sm">${errorMessage}</p>`;
+                    responseArea.appendChild(errorDiv);
+                } finally {
+                    // Hide loading indicator and re-enable button
+                    loadingIndicator.classList.add('hidden');
+                    askBtn.disabled = false;
+                    toggleBtn.classList.remove('loading');
+                    toggleIcon.style.animation = 'none';
+
+                    questionInput.value = '';
+                    
+                    // Automatically scroll to the bottom after the new message is displayed
+                    responseArea.scrollTop = responseArea.scrollHeight;
+                }
+            }
+
+            askBtn.addEventListener('click', askQuestion);
+            questionInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    askQuestion();
+                }
+            });
+            
+            // Toggle chatbot visibility on button click
+            toggleBtn.addEventListener('click', () => {
+                chatbotContainer.classList.toggle('open');
+            });
+        });
+    </script>
+</body>
+</html>
