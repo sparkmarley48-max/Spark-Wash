@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Floating Chatbot Widget</title>
+    <title>Chatbot Interface</title>
     <!-- Tailwind CSS CDN for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -11,106 +11,49 @@
         
         body {
             font-family: 'Inter', sans-serif;
-        }
-
-        /* Container for the floating chatbot */
-        #chatbot-container {
-            position: fixed;
-            bottom: 6rem; /* Position above the toggle button */
-            right: 1.5rem;
-            z-index: 1000;
-            width: 100%;
-            max-width: 400px; /* Limit max width for desktop */
-            background-color: #021a4b; /* slate-800 */
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-            transform: translateY(100%);
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        /* State for when the chatbot is open */
-        #chatbot-container.open {
-            transform: translateY(0);
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* The floating toggle button */
-        #chatbot-toggle-btn {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            z-index: 1001;
-            background-color: #6366f1; /* indigo-500 */
-            color: white;
-            width: 4rem;
-            height: 4rem;
+            background-color: #f3f4f6;
+            padding: 2rem;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px 5px rgba(99, 102, 241, 0.6); /* Initial glow */
-            animation: glowing 2s infinite ease-in-out;
-            transition: transform 0.3s ease, background-color 0.3s ease;
+            min-height: 100vh;
+            margin: 0;
         }
 
-        #chatbot-toggle-btn:hover {
-            transform: scale(1.1);
-            animation-play-state: paused; /* Pause glow on hover */
+        /* Container for the chatbot */
+        #chatbot-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            background-color: #021a4b;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            opacity: 1;
+            transform: none;
+            pointer-events: auto;
         }
         
-        /* Keyframes for the glowing animation */
-        @keyframes glowing {
-            0% {
-                box-shadow: 0 0 10px 5px rgba(99, 102, 241, 0.6);
-            }
-            50% {
-                box-shadow: 0 0 20px 10px rgba(99, 102, 241, 0.8), 0 0 30px 15px rgba(99, 102, 241, 0.4);
-            }
-            100% {
-                box-shadow: 0 0 10px 5px rgba(99, 102, 241, 0.6);
-            }
-        }
-        
-        /* Loading state for the toggle button */
-        #chatbot-toggle-btn.loading {
-            cursor: progress;
-            animation: pulse-bg 1s infinite; /* A distinct loading animation */
-            box-shadow: none; /* Turn off the glowing effect */
-        }
-
-        /* Loading background animation */
-        @keyframes pulse-bg {
-            0% { background-color: #6366f1; }
-            50% { background-color: #4338ca; }
-            100% { background-color: #6366f1; }
-        }
-
         /* General chatbot styles */
         .avatar {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #6366f1; /* indigo-500 */
+            border: 3px solid #6366f1;
         }
         
         .chat-message {
-            background-color: #334155; /* slate-700 */
+            background-color: #334155;
             padding: 1rem;
             border-radius: 1rem;
             text-align: left;
         }
         
         .chat-message.ai-message {
-            background-color: #0f172a; /* slate-900 */
+            background-color: #0f172a;
             border: 1px solid #334155;
-              /* Add this line to set text color to white */
-    color: #fff;
+            color: #fff;
         }
 
         .loader {
@@ -128,7 +71,7 @@
         }
 
         #responseArea {
-            max-height: 250px; /* Set a fixed height for scrolling */
+            max-height: 250px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
@@ -140,31 +83,15 @@
         /* Responsive adjustments for mobile */
         @media (max-width: 640px) {
             #chatbot-container {
-                right: 0.5rem;
-                bottom: 5.5rem;
                 max-width: 90vw;
                 width: 90vw;
                 padding: 1rem;
-            }
-            
-            #chatbot-toggle-btn {
-                right: 0.5rem;
-                bottom: 0.5rem;
             }
         }
     </style>
 </head>
 <body class="antialiased">
-    <div id="chatbot-overlay"></div>
-    <!-- Floating Chatbot Toggle Button -->
-    <button id="chatbot-toggle-btn" aria-label="Open chat widget">
-        <!-- SVG Chat icon -->
-        <svg id="toggle-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-8 h-8">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.76c0 1.144.945 2.062 2.106 2.062h.166l.764.764a.75.75 0 001.272.235l2.064-2.064a.75.75 0 01.442-.298l.582-.146a.75.75 0 00.758-.168l1.458-1.458a.75.75 0 01.53-.22h.004a.75.75 0 01.53.22l1.458 1.458a.75.75 0 00.758.168l.582.146a.75.75 0 01.442.298l2.064 2.064a.75.75 0 001.272-.235l.764-.764h.166c1.161 0 2.106-.918 2.106-2.062V6.51c0-1.144-.945-2.062-2.106-2.062H4.356C3.195 4.448 2.25 5.366 2.25 6.51v6.25z" />
-        </svg>
-    </button>
-
-    <!-- Floating Chatbot Container -->
+    <!-- Chatbot Container -->
     <div id="chatbot-container">
         <div class="flex flex-col items-center mb-6">
             <img src="https://placehold.co/80x80/6366f1/ffffff?text=Alex" alt="Technician's photo" class="avatar mb-4">
@@ -203,15 +130,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const chatbotContainer = document.getElementById('chatbot-container');
-            const toggleBtn = document.getElementById('chatbot-toggle-btn');
             const questionInput = document.getElementById('questionInput');
             const askBtn = document.getElementById('askBtn');
             const responseArea = document.getElementById('responseArea');
             const loadingIndicator = document.getElementById('loadingIndicator');
-            const toggleIcon = document.getElementById('toggle-icon');
 
             // Placeholder business knowledge for the RAG system
-            // The text has been formatted into a clean, multi-line string to prevent syntax errors.
             const businessKnowledge = `
                 ### Spark Wash Business Knowledge Base
 
@@ -254,9 +178,6 @@
 
             // Function to handle the API call with exponential backoff
             async function callGeminiApi(prompt, retries = 0) {
-                // To use this in your personal project, you need to replace "YOUR_API_KEY_HERE"
-                // with a valid API key from your Google Cloud Console or Google AI Studio.
-                // Our system's key will not work in your local environment due to domain restrictions.
                 const apiKey = "AIzaSyBfyeioijtuTAO1Vig2r-b-82NmYIZQOHg";
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                 
@@ -308,10 +229,8 @@
                 // Show loading indicator in the chat window
                 loadingIndicator.classList.remove('hidden');
                 
-                // Disable the ask button and show loading effect
+                // Disable the ask button
                 askBtn.disabled = true;
-                toggleBtn.classList.add('loading');
-                toggleIcon.style.animation = 'spin 1.5s linear infinite';
                 
                 // Scroll to the bottom to show the user's message
                 responseArea.scrollTop = responseArea.scrollHeight;
@@ -339,7 +258,6 @@
                     // Display the AI response
                     const responseMessage = document.createElement('div');
                     responseMessage.classList.add('chat-message', 'ai-message');
-                    // Use a library to render markdown as HTML
                     responseMessage.innerHTML = marked.parse(answer);
                     responseArea.appendChild(responseMessage);
                     
@@ -354,8 +272,6 @@
                     // Hide loading indicator and re-enable button
                     loadingIndicator.classList.add('hidden');
                     askBtn.disabled = false;
-                    toggleBtn.classList.remove('loading');
-                    toggleIcon.style.animation = 'none';
 
                     questionInput.value = '';
                     
@@ -369,17 +285,6 @@
                 if (e.key === 'Enter') {
                     askQuestion();
                 }
-            });
-            
-            // Toggle chatbot visibility on button click
-            const overlay = document.getElementById('chatbot-overlay');
-            toggleBtn.addEventListener('click', () => {
-                chatbotContainer.classList.toggle('open');
-                overlay.classList.toggle('open');
-            });
-            overlay.addEventListener('click', () => {
-                chatbotContainer.classList.remove('open');
-                overlay.classList.remove('open');
             });
         });
     </script>
