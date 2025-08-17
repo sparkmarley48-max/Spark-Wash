@@ -767,4 +767,46 @@
 </body>
 </html>
 <!-- Embed chatbot from bot.html -->
-<iframe src="bot.html" style="width:350px;height:700px;border:none;position:fixed;bottom:24px;right:24px;z-index:999;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.2);background:#f0f0f100;" allow="clipboard-write"></iframe>
+<iframe id="chatbot-frame" 
+  src="bot.html"
+  style="
+    width: 350px; 
+    height: 500px; 
+    border: none; 
+    position: fixed; 
+    bottom: 100px; 
+    right: 24px; 
+    z-index: 999; 
+    border-radius: 16px; 
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2); 
+    background: #fff; 
+    display: none; /* hidden initially */
+  " 
+  allow="clipboard-write">
+</iframe>
+
+<button id="chat-toggle" 
+  style="
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    z-index: 1000; 
+    background: #2563eb; 
+    color: white; 
+    border-radius: 50%; 
+    width: 64px; 
+    height: 64px; 
+    border: none; 
+    cursor: pointer; 
+  ">
+  💬
+</button>
+
+<script>
+  const toggleBtn = document.getElementById("chat-toggle");
+  const chatbot = document.getElementById("chatbot-frame");
+
+  toggleBtn.addEventListener("click", () => {
+    chatbot.style.display = chatbot.style.display === "none" ? "block" : "none";
+  });
+</script>
