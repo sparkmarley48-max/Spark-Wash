@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Wash</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* A dark background */
+        }
+        
+        .card {
+            background-color: #1e293b; /* slate-800 */
+            border: 1px solid #334155; /* slate-700 */
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Custom styles for form elements */
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="time"],
+        select {
+            background-color: #334155; /* slate-700 */
+            color: #e2e8f0; /* text-gray-200 */
+            border: 1px solid #4a5568; /* border-gray-600 */
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            width: 100%;
+            transition: all 0.2s ease-in-out;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #6366f1; /* indigo-500 */
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.5);
+        }
+        select {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23a0aec0'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd' /%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em;
+            padding-right: 2.5rem;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s ease-in-out;
+        }
+        
+        .checkbox-label:hover {
+            background-color: #334155; /* slate-700 */
+        }
+
+        /* Styles for disabled elements */
+        .checkbox-label.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="antialiased flex items-center justify-center min-h-screen">
+
+    <div class="container mx-auto px-4 py-8 max-w-2xl card">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-center text-white mb-2 leading-tight">Book Your Mobile Wash</h1>
+        <p class="text-sm text-center text-gray-400 mb-8">Schedule a convenient car wash with professional care and eco-friendly practices.</p>
+
+        <!-- The form action will be updated later with the Apps Script web app URL -->
+        <form id="bookingForm" class="space-y-6">
+            <!-- Contact Information Section -->
+            <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Full Name -->
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                        <input type="text" id="name" name="name" required placeholder="John Doe">
+                    </div>
+                    <!-- Email Address -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-1">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <!-- Phone Number -->
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="+233 24 123 4567">
+                </div>
+            </div>
+
+            <!-- Service Selection Section -->
+            <div class="space-y-4">
+                <h2 class="text-lg font-bold text-gray-300 pt-4">Choose Your Service</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Service Type -->
+                    <div>
+                        <label for="service" class="block text-sm font-medium text-gray-300 mb-1">Wash Package</label>
+                        <select id="service" name="service" required>
+                            <option value="" disabled selected>Choose a package</option>
+                            <option value="Quick Clean" 
+                                data-prices="40,50,90,150" 
+                                data-subscription-prices="30,40,70,120">
+                                (Exterior Only) (₵40 | ₵50 | ₵90 | ₵150)
+                            </option>
+                            <option value="Full Wash" 
+                                data-prices="80,100,180,250" 
+                                data-subscription-prices="60,80,140,200">
+                                (Interior + Exterior) (₵80 | ₵100 | ₵180 | ₵250 )
+                            </option>
+                            <option value="Premium Detail Wash" 
+                                data-prices="100,200,250,300" 
+                                data-subscription-prices="80,160,200,240">
+                                Ultimate Detailling (₵100 | ₵200 | ₵250 | ₵300)
+                            </option>
+                            <option value="Full Car Restoration" 
+                                data-prices="150,250,350,450" 
+                                data-subscription-prices="120,200,280,360">
+                                Wash to sell (₵150 | ₵250 | ₵350 – ₵450)
+                            </option>
+                        </select>
+                    </div>
+                    <!-- Vehicle Type -->
+                    <div>
+                        <label for="vehicle" class="block text-sm font-medium text-gray-300 mb-1">Vehicle Type</label>
+                        <select id="vehicle" name="vehicle" required>
+                            <option value="" disabled selected>Choose vehicle type</option>
+                            <option value="Sedan">Sedan</option>
+                            <option value="SUV">SUV</option>
+                            <option value="Van">Van</option>
+                            <option value="Truck">Truck</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Subscription Checkbox -->
+            <div class="mt-4">
+                <label class="checkbox-label text-sm text-gray-300" for="subscription">
+                    <input type="checkbox" id="subscription" name="subscription" value="true" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                    <span>Sign up for a Monthly Subscription (get a discount!) </span>
+                </label>
+            </div>
+            
+            <!-- Subscription Washes Per Month Selector -->
+            <div id="washesPerMonthSection" class="hidden">
+                <label for="washesPerMonth" class="block text-sm font-medium text-gray-300 mb-1">Washes Per Month</label>
+                <select id="washesPerMonth" name="washesPerMonth" required>
+                    <!-- Options will be dynamically populated by JavaScript -->
+                </select>
+            </div>
+
+            <!-- Add-ons Section -->
+            <div class="space-y-4">
+                <h2 id="addonsHeading" class="text-lg font-bold text-gray-300 pt-4">Add-ons (Optional)</h2>
+                <div class="space-y-2" id="addonsContainer">
+                    <label class="checkbox-label text-sm text-gray-300">
+                        <input type="checkbox" name="addons[]" value="Interior Vacuum" data-price="30" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                        <span>Interior Vacuum (₵30)</span>
+                    </label>
+                    <label class="checkbox-label text-sm text-gray-300">
+                        <input type="checkbox" name="addons[]" value="Tire Shine" data-price="30" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                        <span>Tire Shine (₵30)</span>
+                    </label>
+                    <label class="checkbox-label text-sm text-gray-300">
+                        <input type="checkbox" name="addons[]" value="Wax Application" data-price="30" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                        <span>Wax Application (₵30)</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Real-time Total Price Display -->
+            <div class="flex justify-between items-center bg-slate-700 p-4 rounded-lg mt-6">
+                <span class="text-md font-bold text-gray-300">Total Estimate:</span>
+                <span id="totalPrice" class="text-2xl font-extrabold text-white">₵0</span>
+            </div>
+
+            <!-- Date & Time Section -->
+            <div class="space-y-4">
+                <h2 class="text-lg font-bold text-gray-300 pt-4">Preferred Date & Time</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Date -->
+                    <div>
+                        <label for="date" class="block text-sm font-medium text-gray-300 mb-1">Date</label>
+                        <input type="date" id="date" name="date" required>
+                        <label class="checkbox-label text-sm text-gray-300 mt-2" for="date-not-sure">
+                            <input type="checkbox" id="date-not-sure" name="date-not-sure" value="true" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                            <span>I'm not sure</span>
+                        </label>
+                    </div>
+                    <!-- Time -->
+                    <div>
+                        <label for="time" class="block text-sm font-medium text-gray-300 mb-1">Time</label>
+                        <input type="time" id="time" name="time" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-6 rounded-md transition-colors duration-300 mt-6">
+                Book My Wash
+            </button>
+
+            <!-- Status Message Area -->
+            <div id="statusMessage" class="mt-4 text-center text-sm font-semibold"></div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('bookingForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            const serviceSelect = document.getElementById('service');
+            const vehicleSelect = document.getElementById('vehicle');
+            const subscriptionCheckbox = document.getElementById('subscription');
+            const washesPerMonthSelect = document.getElementById('washesPerMonth');
+            const washesPerMonthSection = document.getElementById('washesPerMonthSection');
+            const addonCheckboxes = document.querySelectorAll('input[name="addons[]"]');
+            const addonLabels = document.querySelectorAll('.checkbox-label');
+            const addonsHeading = document.getElementById('addonsHeading');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const dateInput = document.getElementById('date');
+            const dateNotSureCheckbox = document.getElementById('date-not-sure');
+
+            // The URL for your deployed Apps Script web app goes here
+            // You will get this URL in the deployment instructions
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbyh6WPT2GyjAL0T3byFQZJm1QcwBKg_y_2BUkmHF_TdBqZxGp_UDwAhhCw3OK7y0eqm6Q/exec';
+
+            // Function to update the total price
+            function updateTotalPrice() {
+                let total = 0;
+                
+                // Get the base price of the selected service based on vehicle type
+                const selectedServiceOption = serviceSelect.options[serviceSelect.selectedIndex];
+                const selectedVehicleOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+
+                if (selectedServiceOption.value && selectedVehicleOption.value) {
+                    let prices;
+                    // Check if the subscription is selected and use the correct prices
+                    if (subscriptionCheckbox.checked) {
+                        prices = selectedServiceOption.dataset.subscriptionPrices.split(',').map(Number);
+                    } else {
+                        prices = selectedServiceOption.dataset.prices.split(',').map(Number);
+                    }
+
+                    let vehicleIndex;
+                    switch (selectedVehicleOption.value) {
+                        case 'Sedan':
+                            vehicleIndex = 0;
+                            break;
+                        case 'SUV':
+                            vehicleIndex = 1;
+                            break;
+                        case 'Van':
+                            vehicleIndex = 2;
+                            break;
+                        case 'Truck':
+                            vehicleIndex = 3;
+                            break;
+                        default:
+                            vehicleIndex = -1;
+                    }
+                    
+                    if (vehicleIndex !== -1 && prices[vehicleIndex] !== undefined) {
+                        total += prices[vehicleIndex];
+                    }
+                }
+
+                // Add the price of each selected add-on only if they are not disabled
+                addonCheckboxes.forEach(checkbox => {
+                    if (checkbox.checked && !checkbox.disabled) {
+                        // The price is stored in a data attribute
+                        total += parseInt(checkbox.dataset.price);
+                    }
+                });
+                
+                // Multiply by the number of washes per month if subscription is selected
+                if (subscriptionCheckbox.checked) {
+                    const washesPerMonth = parseInt(washesPerMonthSelect.value);
+                    total *= washesPerMonth;
+                }
+
+                // Update the total price display
+                totalPriceElement.textContent = `₵${total}`;
+            }
+
+            // Function to dynamically update the washes per month options
+            function updateWashesPerMonthOptions() {
+                // Clear existing options
+                washesPerMonthSelect.innerHTML = '';
+                
+                const selectedServiceOption = serviceSelect.options[serviceSelect.selectedIndex];
+                const selectedVehicleOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+                
+                if (selectedServiceOption.value && selectedVehicleOption.value) {
+                    const prices = selectedServiceOption.dataset.subscriptionPrices.split(',').map(Number);
+                    let vehicleIndex;
+                    switch (selectedVehicleOption.value) {
+                        case 'Sedan':
+                            vehicleIndex = 0;
+                            break;
+                        case 'SUV':
+                            vehicleIndex = 1;
+                            break;
+                        case 'Van':
+                            vehicleIndex = 2;
+                            break;
+                        case 'Truck':
+                            vehicleIndex = 3;
+                            break;
+                        default:
+                            vehicleIndex = -1;
+                    }
+                    
+                    if (vehicleIndex !== -1 && prices[vehicleIndex] !== undefined) {
+                        const basePrice = prices[vehicleIndex];
+                        for (let i = 2; i <= 4; i++) {
+                            const totalOptionPrice = basePrice * i;
+                            const option = document.createElement('option');
+                            option.value = i;
+                            option.textContent = `${i} washes per month (₵${totalOptionPrice})`;
+                            if (i === 4) { // Set 4 as default selected
+                                option.selected = true;
+                            }
+                            washesPerMonthSelect.appendChild(option);
+                        }
+                    }
+                }
+            }
+
+            // Function to enable or disable add-ons based on the selected service
+            function toggleAddons() {
+                const selectedService = serviceSelect.value;
+                const disableAddons = selectedService === 'Premium Detail Wash' || selectedService === 'Full Car Restoration';
+
+                if (disableAddons) {
+                    addonsHeading.textContent = 'Add-ons (Included in this package)';
+                    addonCheckboxes.forEach(checkbox => {
+                        checkbox.checked = false; // Uncheck any selected add-ons
+                        checkbox.disabled = true;
+                    });
+                    addonLabels.forEach(label => label.classList.add('disabled'));
+                } else {
+                    addonsHeading.textContent = 'Add-ons (Optional)';
+                    addonCheckboxes.forEach(checkbox => {
+                        checkbox.disabled = false;
+                    });
+                    addonLabels.forEach(label => label.classList.remove('disabled'));
+                }
+                updateTotalPrice(); // Recalculate price after toggling
+            }
+            
+            // Function to show/hide the washes per month selector
+            function toggleWashesPerMonth() {
+                if (subscriptionCheckbox.checked) {
+                    washesPerMonthSection.classList.remove('hidden');
+                } else {
+                    washesPerMonthSection.classList.add('hidden');
+                }
+                updateTotalPrice(); // Recalculate price
+            }
+
+            // Function to handle the "Not Sure" date option
+            function toggleDateNotSure() {
+                if (dateNotSureCheckbox.checked) {
+                    dateInput.disabled = true;
+                    dateInput.removeAttribute('required');
+                    dateInput.value = ''; // Clear the value
+                } else {
+                    dateInput.disabled = false;
+                    dateInput.setAttribute('required', 'true');
+                }
+            }
+            // Add event listeners
+            serviceSelect.addEventListener('change', () => {
+                toggleAddons();
+                updateWashesPerMonthOptions();
+                updateTotalPrice();
+            });
+            vehicleSelect.addEventListener('change', () => {
+                updateWashesPerMonthOptions();
+                updateTotalPrice();
+            });
+            subscriptionCheckbox.addEventListener('change', toggleWashesPerMonth);
+            washesPerMonthSelect.addEventListener('change', updateTotalPrice);
+            addonCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateTotalPrice);
+            });
+            dateNotSureCheckbox.addEventListener('change', toggleDateNotSure);
+
+            // Initial call to set the price and add-ons to the correct state on page load
+            updateWashesPerMonthOptions();
+            toggleAddons();
+            toggleWashesPerMonth();
+            updateTotalPrice();
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'Booking...';
+                statusMessage.textContent = 'Submitting your booking...';
+                statusMessage.className = 'mt-4 text-center text-sm font-semibold text-gray-400';
+
+                // Use a FormData object to easily collect all form data
+                const formData = new FormData(form);
+
+                // If "Not Sure" is checked, set the date value to a specific string
+                if (dateNotSureCheckbox.checked) {
+                    formData.set('date', 'Not Sure');
+                }
+
+                // Send a POST request to the Apps Script web app
+                fetch(scriptURL, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Book My Wash';
+                    if (data.result === 'success') {
+                        statusMessage.textContent = 'Booking successful! We will contact you shortly.';
+                        statusMessage.className = 'mt-4 text-center text-sm font-semibold text-green-500';
+                        form.reset(); // Clear the form
+                        toggleAddons(); // Reset the add-on state
+                        toggleWashesPerMonth(); // Hide washes per month section
+                        toggleDateNotSure(); // Reset the date option
+                        updateTotalPrice(); // Reset the price display
+                    } else {
+                        statusMessage.textContent = 'Error: ' + data.error;
+                        statusMessage.className = 'mt-4 text-center text-sm font-semibold text-red-500';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = 'Book My Wash';
+                    statusMessage.textContent = 'There was a problem with your booking. Please try again later.';
+                    statusMessage.className = 'mt-4 text-center text-sm font-semibold text-red-500';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

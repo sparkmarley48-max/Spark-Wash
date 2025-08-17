@@ -142,7 +142,9 @@
             #chatbot-container {
                 right: 0.5rem;
                 bottom: 5.5rem;
-                max-width: calc(100% - 1rem); /* Full width on smaller screens */
+                max-width: 90vw;
+                width: 90vw;
+                padding: 1rem;
             }
             
             #chatbot-toggle-btn {
@@ -153,7 +155,7 @@
     </style>
 </head>
 <body class="antialiased">
-
+    <div id="chatbot-overlay"></div>
     <!-- Floating Chatbot Toggle Button -->
     <button id="chatbot-toggle-btn" aria-label="Open chat widget">
         <!-- SVG Chat icon -->
@@ -370,8 +372,14 @@
             });
             
             // Toggle chatbot visibility on button click
+            const overlay = document.getElementById('chatbot-overlay');
             toggleBtn.addEventListener('click', () => {
                 chatbotContainer.classList.toggle('open');
+                overlay.classList.toggle('open');
+            });
+            overlay.addEventListener('click', () => {
+                chatbotContainer.classList.remove('open');
+                overlay.classList.remove('open');
             });
         });
     </script>
