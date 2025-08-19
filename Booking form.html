@@ -438,13 +438,45 @@
                     submitBtn.disabled = false;
                     submitBtn.innerText = 'Book My Wash';
                     if (data.result === 'success') {
-                        statusMessage.textContent = 'Booking successful! We will contact you shortly.';
+                        statusMessage.textContent = 'Booking successful! Redirecting to payment page...';
                         statusMessage.className = 'mt-4 text-center text-sm font-semibold text-green-500';
-                        form.reset(); // Clear the form
-                        toggleAddons(); // Reset the add-on state
-                        toggleWashesPerMonth(); // Hide washes per month section
-                        toggleDateNotSure(); // Reset the date option
-                        updateTotalPrice(); // Reset the price display
+                        
+                        // Collect booking details for payment page
+                        const bookingDetails = {
+                            name: document.getElementById('name').value,
+                            phone: document.getElementById('phone').value,
+                            service: serviceSelect.options[serviceSelect.selectedIndex].text,
+                            vehicle: vehicleSelect.options[vehicleSelect.selectedIndex].text,
+                            date: dateNotSureCheckbox.checked ? 'Not Sure' : document.getElementById('date').value,
+                            time: document.getElementById('time').value,
+                            amount: totalPriceElement.textContent.replace('₵', ''),
+                            subscription: subscriptionCheckbox.checked ? washesPerMonthSelect.value + ' washes/month' : 'One-time',
+                            addons: Array.from(addonCheckboxes)
+                                .filter(cb => cb.checked && !cb.disabled)
+                                .map(cb => cb.parentElement.querySelector('span').textContent)
+                                .join(', ')
+                        };
+                        
+                        // Build URL parameters
+                        const params = new URLSearchParams({
+                            amount: bookingDetails.amount,
+                            service: bookingDetails.service,
+                            vehicle: bookingDetails.vehicle,
+                            subscription: bookingDetails.subscription,
+                            addons: bookingDetails.addons || 'None'
+                        });
+                        
+                        // Redirect to payment page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = 'payment.html?' + params.toString();
+                        }, 2000);
+                        
+                        // Optional: Reset form after redirect
+                        // form.reset();
+                        // toggleAddons();
+                        // toggleWashesPerMonth();
+                        // toggleDateNotSure();
+                        // updateTotalPrice();
                     } else {
                         statusMessage.textContent = 'Error: ' + data.error;
                         statusMessage.className = 'mt-4 text-center text-sm font-semibold text-red-500';

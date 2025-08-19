@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - Spark Wash</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+        }
+        
+        .card {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .payment-option {
+            background-color: #334155;
+            border: 1px solid #475569;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .payment-option:hover {
+            background-color: #475569;
+            border-color: #6366f1;
+        }
+
+        .payment-option.selected {
+            background-color: #3730a3;
+            border-color: #6366f1;
+        }
+
+        .qr-code {
+            background: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: inline-block;
+        }
+
+        .copy-btn {
+            background-color: #4f46e5;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background-color: #3730a3;
+        }
+
+        .copy-btn:active {
+            background-color: #312e81;
+        }
+
+        .skip-btn {
+            background: linear-gradient(135deg, #ff6b35, #f59e0b);
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .skip-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased flex items-center justify-center min-h-screen p-4">
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <div class="card p-8">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-center text-white mb-2 leading-tight">Complete Your Payment</h1>
+            <p class="text-sm text-center text-gray-400 mb-4">Choose your preferred mobile money payment method</p>
+            
+            <!-- Skip Button -->
+            <div class="text-center mb-6">
+                <button class="skip-btn" onclick="skipToPayOnDelivery()">
+                    Skip Payment - Pay on Delivery Instead
+                </button>
+            </div>
+
+            <!-- Payment Summary -->
+            <div class="bg-slate-700 p-6 rounded-lg mb-8">
+                <h2 class="text-xl font-bold text-white mb-4">Payment Summary</h2>
+                <div class="flex justify-between items-center text-gray-300">
+                    <span>Car Wash Service</span>
+                    <span id="serviceAmount" class="text-white font-semibold">₵0</span>
+                </div>
+                <hr class="border-slate-600 my-3">
+                <div class="flex justify-between items-center text-white font-bold">
+                    <span>Total Amount</span>
+                    <span id="totalAmount" class="text-2xl">₵0</span>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <!-- MTN Mobile Money -->
+                <div class="payment-option p-6 text-center" onclick="selectPayment('mtn')">
+                    <div class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">MTN</span>
+                    </div>
+                    <h3 class="text-white font-semibold mb-2">MTN Mobile Money</h3>
+                    <p class="text-gray-400 text-sm">Pay with MTN MoMo</p>
+                </div>
+
+                <!-- Telecel -->
+                <div class="payment-option p-6 text-center" onclick="selectPayment('telecel')">
+                    <div class="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">T</span>
+                    </div>
+                    <h3 class="text-white font-semibold mb-2">Telecel Cash</h3>
+                    <p class="text-gray-400 text-sm">Pay with Telecel Cash</p>
+                </div>
+
+                <!-- AirtelTigo -->
+                <div class="payment-option p-6 text-center" onclick="selectPayment('airtel')">
+                    <div class="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white font-bold text-xl">A</span>
+                    </div>
+                    <h3 class="text-white font-semibold mb-2">AirtelTigo Money</h3>
+                    <p class="text-gray-400 text-sm">Pay with AirtelTigo</p>
+                </div>
+            </div>
+
+            <!-- Payment Details -->
+            <div id="paymentDetails" class="hidden">
+                <div class="bg-slate-700 p-6 rounded-lg">
+                    <h3 class="text-lg font-bold text-white mb-4" id="paymentTitle">Payment Instructions</h3>
+                    
+                    <!-- Phone Number Display -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Pay to this number:</label>
+                        <div class="flex items-center space-x-4">
+                            <span id="paymentNumber" class="text-white text-xl font-mono bg-slate-600 px-4 py-2 rounded">059 123 4567</span>
+                            <button class="copy-btn" onclick="copyNumber()">Copy</button>
+                        </div>
+                    </div>
+
+                    <!-- Account Name -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Account Name:</label>
+                        <span class="text-white font-semibold">Spark Wash Services</span>
+                    </div>
+
+                    <!-- QR Code -->
+                    <div class="mb-6 text-center">
+                        <label class="block text-sm font-medium text-gray-300 mb-2">Scan to Pay:</label>
+                        <div class="qr-code">
+                            <div id="qrPlaceholder" class="w-48 h-48 bg-gray-200 flex items-center justify-center text-gray-500">
+                                QR Code for <span id="qrNetwork">selected</span> payment
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Steps -->
+                    <div class="text-sm text-gray-300">
+                        <h4 class="font-semibold text-white mb-2">How to pay:</h4>
+                        <ol class="list-decimal list-inside space-y-1" id="paymentSteps">
+                            <li>Dial the USSD code on your phone</li>
+                            <li>Select "Send Money"</li>
+                            <li>Enter the number: 059 123 4567</li>
+                            <li>Enter amount: <span id="stepAmount">₵0</span></li>
+                            <li>Enter your reference: Spark Wash</li>
+                            <li>Confirm payment</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Section -->
+            <div id="confirmationSection" class="hidden mt-8">
+                <div class="bg-green-900 border border-green-700 rounded-lg p-6">
+                    <h3 class="text-lg font-bold text-green-300 mb-4">Payment Confirmation</h3>
+                    <p class="text-green-200 mb-4">
+                        After making payment, please send a screenshot of your payment confirmation to:
+                    </p>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-white font-mono bg-green-800 px-4 py-2 rounded">059 123 4567</span>
+                        <span class="text-green-300">(WhatsApp/SMS)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Back to Home -->
+            <div class="text-center mt-8">
+                <a href="index.html" class="text-indigo-400 hover:text-indigo-300 font-semibold">
+                    ← Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get amount from URL parameters or use default
+        function getAmountFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('amount') || '100';
+        }
+
+        // Set amounts
+        const amount = getAmountFromURL();
+        document.getElementById('serviceAmount').textContent = `₵${amount}`;
+        document.getElementById('totalAmount').textContent = `₵${amount}`;
+        document.getElementById('stepAmount').textContent = `₵${amount}`;
+
+        // Skip to pay on delivery function
+        function skipToPayOnDelivery() {
+            if (confirm('Are you sure you want to skip payment and pay on delivery instead?')) {
+                alert('Great! Your booking is confirmed. You can pay when we arrive for your car wash service.');
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Payment networks data
+        const paymentNetworks = {
+            mtn: {
+                name: 'MTN Mobile Money',
+                number: '059 123 4567',
+                ussd: '*170#',
+                color: 'yellow-500'
+            },
+            telecel: {
+                name: 'Telecel Cash',
+                number: '020 123 4567',
+                ussd: '*110#',
+                color: 'red-600'
+            },
+            airtel: {
+                name: 'AirtelTigo Money',
+                number: '027 123 4567',
+                ussd: '*110#',
+                color: 'red-500'
+            }
+        };
+
+        // Select payment method
+        function selectPayment(network) {
+            // Remove selected class from all options
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+
+            // Add selected class to clicked option
+            event.target.closest('.payment-option').classList.add('selected');
+
+            // Show payment details
+            const networkData = paymentNetworks[network];
+            document.getElementById('paymentTitle').textContent = `${networkData.name} Payment`;
+            document.getElementById('paymentNumber').textContent = networkData.number;
+            document.getElementById('qrNetwork').textContent = networkData.name;
+            
+            // Update payment steps
+            const steps = document.getElementById('paymentSteps');
+            steps.innerHTML = `
+                <li>Dial ${networkData.ussd} on your phone</li>
+                <li>Select "Send Money"</li>
+                <li>Enter the number: ${networkData.number}</li>
+                <li>Enter amount: ₵${amount}</li>
+                <li>Enter your reference: Spark Wash</li>
+                <li>Confirm payment</li>
+            `;
+
+            // Show sections
+            document.getElementById('paymentDetails').classList.remove('hidden');
+            document.getElementById('confirmationSection').classList.remove('hidden');
+        }
+
+        // Copy number to clipboard
+        function copyNumber() {
+            const number = document.getElementById('paymentNumber').textContent;
+            navigator.clipboard.writeText(number.replace(/\s/g, '')).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            });
+        }
+
+        // Handle payment from booking form
+        function handlePaymentRedirect() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const service = urlParams.get('service') || 'Car Wash Service';
+            const vehicle = urlParams.get('vehicle') || '';
+            const total = urlParams.get('total') || amount;
+            
+            // Update display
+            document.getElementById('serviceAmount').textContent = `₵${total}`;
+            document.getElementById('totalAmount').textContent = `₵${total}`;
+            document.getElementById('stepAmount').textContent = `₵${total}`;
+        }
+
+        // Initialize
+        handlePaymentRedirect();
+    </script>
+
+</body>
+</html>
