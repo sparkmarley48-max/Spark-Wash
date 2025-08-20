@@ -207,9 +207,14 @@
                         </label>
                     </div>
                     <!-- Time -->
+                    <!-- Time -->
                     <div>
                         <label for="time" class="block text-sm font-medium text-gray-300 mb-1">Time</label>
                         <input type="time" id="time" name="time" required>
+                        <label class="checkbox-label text-sm text-gray-300 mt-2" for="time-not-sure">
+                            <input type="checkbox" id="time-not-sure" name="time-not-sure" value="true" class="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 rounded focus:ring-indigo-500">
+                            <span>I'm not sure</span>
+                        </label>
                     </div>
                 </div>
             </div>
@@ -240,6 +245,8 @@
             const totalPriceElement = document.getElementById('totalPrice');
             const dateInput = document.getElementById('date');
             const dateNotSureCheckbox = document.getElementById('date-not-sure');
+            const timeInput = document.getElementById('time');
+            const timeNotSureCheckbox = document.getElementById('time-not-sure');
 
             // The URL for your deployed Apps Script web app goes here
             // You will get this URL in the deployment instructions
@@ -384,10 +391,21 @@
                 if (dateNotSureCheckbox.checked) {
                     dateInput.disabled = true;
                     dateInput.removeAttribute('required');
-                    dateInput.value = ''; // Clear the value
+                    dateInput.value = '';
                 } else {
                     dateInput.disabled = false;
                     dateInput.setAttribute('required', 'true');
+                }
+            }
+            // NEW: handle "I'm not sure" for time
+            function toggleTimeNotSure() {
+                if (timeNotSureCheckbox.checked) {
+                    timeInput.disabled = true;
+                    timeInput.removeAttribute('required');
+                    timeInput.value = '';
+                } else {
+                    timeInput.disabled = false;
+                    timeInput.setAttribute('required', 'true');
                 }
             }
             // Add event listeners
@@ -406,13 +424,10 @@
                 checkbox.addEventListener('change', updateTotalPrice);
             });
             dateNotSureCheckbox.addEventListener('change', toggleDateNotSure);
-
-            // Initial call to set the price and add-ons to the correct state on page load
-            updateWashesPerMonthOptions();
-            toggleAddons();
-            toggleWashesPerMonth();
-            updateTotalPrice();
-
+            timeNotSureCheckbox.addEventListener('change', toggleTimeNotSure);
+            // Initial setup on page load
+            toggleDateNotSure();
+            toggleTimeNotSure();
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 submitBtn.disabled = true;
@@ -423,9 +438,12 @@
                 // Use a FormData object to easily collect all form data
                 const formData = new FormData(form);
 
-                // If "Not Sure" is checked, set the date value to a specific string
+                // If "Not Sure" is checked, set the values to a placeholder string
                 if (dateNotSureCheckbox.checked) {
                     formData.set('date', 'Not Sure');
+                }
+                if (timeNotSureCheckbox.checked) {
+                    formData.set('time', 'Not Sure');
                 }
 
                 // Send a POST request to the Apps Script web app
@@ -448,7 +466,7 @@
                             service: serviceSelect.options[serviceSelect.selectedIndex].text,
                             vehicle: vehicleSelect.options[vehicleSelect.selectedIndex].text,
                             date: dateNotSureCheckbox.checked ? 'Not Sure' : document.getElementById('date').value,
-                            time: document.getElementById('time').value,
+                            time: timeNotSureCheckbox.checked ? 'Not Sure' : document.getElementById('time').value,
                             amount: totalPriceElement.textContent.replace('₵', ''),
                             subscription: subscriptionCheckbox.checked ? washesPerMonthSelect.value + ' washes/month' : 'One-time',
                             addons: Array.from(addonCheckboxes)
